@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # ESTA ES LA PARTE QUE TE FALTA (La App)
+  app:
+    build: .
+    container_name: nutricore-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=nutricore-db
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=nutricore_db
+      - REDIS_HOST=nutricore-cache
+      - REDIS_PORT=6379
+      - GEMINI_API_KEY=AIzaSyDpBNQm40e-rQfQz-k0L-mamS4xlknrLqw
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:8.0
+    container_name: nutricore-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: nutricore_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: nutricore-cache
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql_data:
