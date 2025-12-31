@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TerminusModule } from '@nestjs/terminus'; 
 
+
 import { MySqlProvider } from './infrastructure/persistence/mysql.provider';
 import { RedisModule } from './infrastructure/adapters/redis/redis.module';
 import { GeminiAdapter } from './infrastructure/adapters/ai/gemini.adapter';

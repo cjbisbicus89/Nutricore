@@ -4,10 +4,9 @@ import { Repository } from 'typeorm';
 import Redis from 'ioredis';
 import * as crypto from 'crypto';
 
-
-import { REDIS_CLIENT } from 'src/infrastructure/adapters/redis/redis.provider';
+import { REDIS_CLIENT } from '../../infrastructure/adapters/redis/redis.provider';
 import { UserLog } from '../../domain/entities/user-log.entity';
-import { GeminiAdapter } from 'src/infrastructure/adapters/ai/gemini.adapter';
+import { GeminiAdapter } from '../../infrastructure/adapters/ai/gemini.adapter'; 
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { NutritionGateway } from '../gateways/nutrition.gateway';
 import { MetabolicLogicService } from '../../domain/services/metabolic-logic.service';
