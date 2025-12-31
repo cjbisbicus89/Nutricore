@@ -17,12 +17,11 @@ export const useAgent = (userId: string) => {
         axios.get(HISTORY_URL),
         axios.get(ROADMAP_URL)
       ]);
-      
       setLogs(historyRes.data.history || []);
       setAnalysis(historyRes.data.analysis || null);
       setRoadmap(roadmapRes.data.projection || null);
     } catch (err) {
-      console.error("Error sincronizando con el cerebro de FITCO AI");
+      console.error("Error sincronizando FITCO");
     }
   }, [HISTORY_URL, ROADMAP_URL]);
 
@@ -31,21 +30,26 @@ export const useAgent = (userId: string) => {
   const sendLog = async (data: any) => {
     setLoading(true);
     try {
+      
       const payload = {
-        userId,
-        weight: Number(data.weight),
-        calories: Number(data.calories),
-        fat: Number(data.fat),
-        sleepHours: Number(data.sleepHours),
-        activityLevel: data.activityLevel || "HIGH"
+        userId: String(userId),
+        weight: parseFloat(data.weight) || 0,
+        calories: parseInt(data.calories) || 0,
+        fat: parseInt(data.fat) || 0,
+        sleepHours: parseInt(data.sleepHours) || 0,
+        activityLevel: String(data.activityLevel || "LOW")
       };
 
+     
       const response = await axios.post(API_URL, payload);
+      
+      
       await fetchAllData(); 
-      return response.data;
+      
+      return response.data; 
     } catch (error: any) {
       
-      throw error;
+      throw error; 
     } finally {
       setLoading(false);
     }

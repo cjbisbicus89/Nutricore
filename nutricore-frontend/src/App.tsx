@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const userId = "angie_gaviria"; 
+  const userId = "cristian_bisbicus"; 
   const { logs, analysis, roadmap, sendLog, loading, fetchLogs } = useAgent(userId);
 
   useSocket(fetchLogs, userId);
@@ -21,24 +21,17 @@ function App() {
     const data = Object.fromEntries(formData);
 
     try {
-      if (Number(data.weight) <= 0) {
-        toast.error("Por favor ingresa un peso válido.");
-        return;
-      }
-
+     
+      const response = await sendLog(data);      
     
-      await sendLog(data);
-      
+      if (response.agentMessage) {
+        toast.success(response.agentMessage);
+      }
       
       form.reset();
-      toast.success("¡Métrica capturada con éxito!");
-    } catch (err: any) {
-      // Si el servidor bloquea por los 5 min (429), solo mostramos este error
-      if (err.response?.status === 429) {
-        toast.error("Importante: Espera 5 min para el nuevo análisis.");
-      } else {
-        toast.error("Error de comunicación con el Agente.");
-      }
+    } catch (err: any) {      
+      const serverErrorMessage = err.response?.data?.message || "Error de comunicación";
+      toast.error(serverErrorMessage);
     }
   };
 
@@ -106,12 +99,10 @@ function App() {
                   <label><Activity size={12}/> PESO (KG)</label>
                   <input name="weight" type="number" step="0.1" placeholder="82.5" required />
                 </div>
-
                 <div className="input-group">
                   <label><Flame size={12}/> CALORÍAS (KCAL)</label>
                   <input name="calories" type="number" placeholder="1800" required />
                 </div>
-
                 <div className="grid-2">
                   <div className="input-group">
                     <label>GRASA (G)</label>
@@ -122,7 +113,6 @@ function App() {
                     <input name="sleepHours" type="number" placeholder="5" required />
                   </div>
                 </div>
-
                 <div className="input-group">
                   <label><Dumbbell size={12}/> ACTIVIDAD</label>
                   <select name="activityLevel">
@@ -131,7 +121,6 @@ function App() {
                     <option value="HIGH">Alta (Atleta)</option>
                   </select>
                 </div>
-                
                 <button type="submit" disabled={loading} className="btn-primary">
                   {loading ? 'ENVIANDO...' : 'GUARDAR CAMBIOS'}
                 </button>
