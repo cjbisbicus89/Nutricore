@@ -7,4 +7,4 @@ Se implementara las siguientes librerías para demostrar dominio técnico del ec
 
 * **Backend:** `@nestjs/core`, `socket.io`, `mysql2`, `@nestjs/typeorm`, `@nestjs/config`.
 * **Frontend:** `react`, `socket.io-client`, `react-hot-toast`, `lucide-react`.
-* **IA:** `@google/generative-ai` (Gemini 1.5 Flash).
+* **IA:** `@google/generative-ai` 
