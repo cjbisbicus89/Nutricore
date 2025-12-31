@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  # ESTA ES LA PARTE QUE TE FALTA (La App)
-  app:
-    build: .
+  # BACKEND
+  backend:
+    build: ./nutricore-backend
     container_name: nutricore-backend
     ports:
       - "3000:3000"
@@ -20,6 +20,18 @@ services:
       - mysql
       - redis
 
+  # FRONTEND (Agregado)
+  frontend:
+    build: ./nutricore-frontend
+    container_name: nutricore-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+
+  # BASES DE DATOS
   mysql:
     image: mysql:8.0
     container_name: nutricore-db

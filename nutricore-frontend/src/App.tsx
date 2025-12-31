@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast'; 
 import { useAgent } from './features/nutrition/hooks/useAgent';
 import { useSocket } from './features/nutrition/hooks/useSocket';
 import { SuccessChart } from './features/nutrition/components/SuccessChart';
@@ -12,23 +12,40 @@ function App() {
   const userId = "angie_gaviria"; 
   const { logs, analysis, roadmap, sendLog, loading, fetchLogs } = useAgent(userId);
 
-  
   useSocket(fetchLogs, userId);
- 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    sendLog(Object.fromEntries(formData));
-    (e.target as HTMLFormElement).reset();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+
+    try {
+      if (Number(data.weight) <= 0) {
+        toast.error("Por favor ingresa un peso válido.");
+        return;
+      }
+
+    
+      await sendLog(data);
+      
+      
+      form.reset();
+      toast.success("¡Métrica capturada con éxito!");
+    } catch (err: any) {
+      // Si el servidor bloquea por los 5 min (429), solo mostramos este error
+      if (err.response?.status === 429) {
+        toast.error("Importante: Espera 5 min para el nuevo análisis.");
+      } else {
+        toast.error("Error de comunicación con el Agente.");
+      }
+    }
   };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F4F7FE' }}>
-     
-     <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
       
-     
       <aside className="fitco-sidebar">
         <div className="sidebar-logo">FITCO <span style={{color: '#00C2A0'}}>NUTRI</span></div>
         <nav style={{ flex: 1 }}>
@@ -45,7 +62,11 @@ function App() {
         <header>
           <div>
             <h2 style={{ fontWeight: '900', margin: 0 }}>NutriCore / Dashboard</h2>
-            <p style={{ fontSize: '11px', color: '#64748B' }}>Martes, 30 de Diciembre 2025</p>
+            <p style={{ fontSize: '11px', color: '#64748B' }}>
+              {new Intl.DateTimeFormat('es-ES', { 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+              }).format(new Date()).replace(/^\w/, (c) => c.toUpperCase())}
+            </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <span style={{ fontSize: '12px', fontWeight: 'bold' }}>{userId}</span>
@@ -53,7 +74,6 @@ function App() {
           </div>
         </header>
 
-       
         {analysis?.isStagnated && (
           <div className="stagnation-alert">
             <AlertTriangle color="#D97706" size={20} />
@@ -63,13 +83,12 @@ function App() {
           </div>
         )}
 
-      
         <div className="kpi-grid">
           {[
-            { t: 'Peso Actual', v: logs[0]?.weight || '0.0', u: 'kg', c: '#059669' },
+            { t: 'Peso Actual', v: logs?.[0]?.weight || '0.0', u: 'kg', c: '#059669' },
             { t: 'Promedio 7D', v: analysis?.averageWeight?.toFixed(1) || '0.0', u: 'kg', c: '#6366F1' },
-            { t: 'Calorías', v: logs[0]?.calories || '0', u: 'kcal', c: '#D97706' },
-            { t: 'Grasa', v: logs[0]?.fat || '0', u: 'g', c: '#2563EB' }
+            { t: 'Calorías', v: logs?.[0]?.calories || '0', u: 'kcal', c: '#D97706' },
+            { t: 'Grasa', v: logs?.[0]?.fat || '0', u: 'g', c: '#2563EB' }
           ].map((k, i) => (
             <div key={i} className="kpi-box">
               <div className="kpi-label">{k.t.toUpperCase()}</div>
@@ -80,7 +99,6 @@ function App() {
 
         <div className="content-grid">
           <div className="left-column">
-           
             <div className="fitco-card">
               <h3 className="card-title">NUEVO REGISTRO</h3>
               <form onSubmit={handleSubmit}>
@@ -120,7 +138,6 @@ function App() {
               </form>
             </div>
 
-           
             <div className="roadmap-card">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Target size={18} color="#00C2A0" />
@@ -135,7 +152,6 @@ function App() {
             </div>
           </div>
 
-        
           <div className="fitco-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
               <h3 className="card-title">TENDENCIA METABÓLICA</h3>
@@ -144,7 +160,13 @@ function App() {
               </div>
             </div>
             <div style={{ width: '100%', height: '350px' }}>
-              <SuccessChart data={logs} />
+              {logs && logs.length > 0 ? (
+                <SuccessChart data={logs} />
+              ) : (
+                <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8'}}>
+                  Esperando datos de la IA...
+                </div>
+              )}
             </div>
           </div>
         </div>

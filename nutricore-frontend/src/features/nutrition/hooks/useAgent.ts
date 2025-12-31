@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
 
 export const useAgent = (userId: string) => {
   const [logs, setLogs] = useState([]);
@@ -10,7 +9,7 @@ export const useAgent = (userId: string) => {
 
   const API_URL = 'http://localhost:3000/api/v1/agent/log';
   const HISTORY_URL = `http://localhost:3000/api/v1/agent/history/${userId}`;
-  const ROADMAP_URL = `http://localhost:3000/api/v1/agent/roadmap/${userId}/75`; // Meta 75kg
+  const ROADMAP_URL = `http://localhost:3000/api/v1/agent/roadmap/${userId}/75`; 
 
   const fetchAllData = useCallback(async () => {
     try {
@@ -41,15 +40,12 @@ export const useAgent = (userId: string) => {
         activityLevel: data.activityLevel || "HIGH"
       };
 
-      await axios.post(API_URL, payload);
-      toast.success('¡Métrica capturada con exito!');
-      fetchAllData(); 
+      const response = await axios.post(API_URL, payload);
+      await fetchAllData(); 
+      return response.data;
     } catch (error: any) {
-      if (error.response?.status === 429) {
-        toast.error('Importante: Espera 5 min para el nuevo análisis.');
-      } else {
-        toast.error('Error de comunicación con el Agente.');
-      }
+      
+      throw error;
     } finally {
       setLoading(false);
     }
