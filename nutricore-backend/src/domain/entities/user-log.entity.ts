@@ -13,13 +13,13 @@ export class UserLog {
   @Column({ type: 'varchar', length: 50, nullable: true }) 
   traceId: string; 
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   weight: number; 
 
   @Column({ type: 'int', unsigned: true })
   calories: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   fat: number;
 
   @Column({ type: 'json', nullable: true })

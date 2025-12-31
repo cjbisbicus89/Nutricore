@@ -21,7 +21,6 @@ function App() {
     const data = Object.fromEntries(formData);
 
     try {
-     
       const response = await sendLog(data);      
     
       if (response.agentMessage) {
@@ -78,8 +77,8 @@ function App() {
 
         <div className="kpi-grid">
           {[
-            { t: 'Peso Actual', v: logs?.[0]?.weight || '0.0', u: 'kg', c: '#059669' },
-            { t: 'Promedio 7D', v: analysis?.averageWeight?.toFixed(1) || '0.0', u: 'kg', c: '#6366F1' },
+            { t: 'Peso Actual', v: Math.round(logs?.[0]?.weight || 0), u: 'kg', c: '#059669' },
+            { t: 'Promedio 7D', v: Math.round(analysis?.averageWeight || 0), u: 'kg', c: '#6366F1' },
             { t: 'Calorías', v: logs?.[0]?.calories || '0', u: 'kcal', c: '#D97706' },
             { t: 'Grasa', v: logs?.[0]?.fat || '0', u: 'g', c: '#2563EB' }
           ].map((k, i) => (
@@ -97,7 +96,14 @@ function App() {
               <form onSubmit={handleSubmit}>
                 <div className="input-group">
                   <label><Activity size={12}/> PESO (KG)</label>
-                  <input name="weight" type="number" step="0.1" placeholder="82.5" required />
+                  
+                  <input 
+                    name="weight" 
+                    type="number" 
+                    placeholder="82" 
+                    onKeyDown={(e) => ["e", "E", "+", "-", ",", "."].includes(e.key) && e.preventDefault()}
+                    required 
+                  />
                 </div>
                 <div className="input-group">
                   <label><Flame size={12}/> CALORÍAS (KCAL)</label>
@@ -137,7 +143,8 @@ function App() {
               <div className="progress-bar-bg">
                 <div className="progress-bar-fill" style={{ width: '65%' }}></div>
               </div>
-              <p className="roadmap-footer">Progreso total: <b>{roadmap?.totalLost || '0'} kg</b> perdidos.</p>
+              {/* Uso de Math.round para mantener la consistencia de enteros en el progreso */}
+              <p className="roadmap-footer">Progreso total: <b>{Math.round(roadmap?.totalLost || 0)} kg</b> perdidos.</p>
             </div>
           </div>
 
